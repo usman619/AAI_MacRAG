@@ -2,12 +2,15 @@ import json
 import re
 import os
 import time
-from sentence_transformers import SentenceTransformer
 import faiss
 import argparse
 from tqdm import tqdm
 import yaml
-with open("../config/config.yaml", "r") as file:
+from pathlib import Path
+from utils.embeddings import get_embedding_client
+
+CONFIG_PATH = Path(__file__).resolve().parent.parent / "config" / "config.yaml"
+with open(CONFIG_PATH, "r") as file:
     config = yaml.safe_load(file)
 model2path = config["model_path"]
 
@@ -17,6 +20,7 @@ def parse_arguments():
     parser.add_argument('--chunk_size', type=int, default=200, help="Minimum chunk size for splitting")
     parser.add_argument('--min_sentence', type=int, default=2, help="Minimum number of sentences in a chunk")
     parser.add_argument('--overlap', type=int, default=2, help="Number of overlapping sentences between chunks")
+    parser.add_argument('--max_docs', type=int, default=None, help="Optional: limit number of documents to process (for testing)")
     return parser.parse_args()
 
 def get_word_count(text):
@@ -65,7 +69,7 @@ def split_sentences(content, chunk_size, min_sentence, overlap):
     
     return chunks
 
-def process_data(file_path, chunk_size, min_sentence, overlap, save_path):
+def process_data(file_path, chunk_size, min_sentence, overlap, save_path, max_docs=None):
     with open(file_path, encoding='utf-8') as f:
         data = json.load(f)
     
@@ -73,6 +77,8 @@ def process_data(file_path, chunk_size, min_sentence, overlap, save_path):
     processed_chunks = []
 
     for idx, item in tqdm(enumerate(data), total=len(data), desc="Processing data"):
+        if max_docs is not None and idx >= max_docs:
+            break
         content = item.get("paragraph_text") or item.get("ch_content") or item.get("ch_contenn")
         chunks = split_sentences(content, chunk_size, min_sentence, overlap)
         for i, chunk in enumerate(chunks):
@@ -87,9 +93,18 @@ def process_data(file_path, chunk_size, min_sentence, overlap, save_path):
     
     return processed_chunks
 
-def calculate_embeddings(content, model_path, vector_store_path):
-    model = SentenceTransformer(model_path)
-    embeddings = model.encode(content)
+def calculate_embeddings(content, embedding_client, vector_store_path, batch_size=512):
+    # embedding_client: EmbeddingClient instance with .encode(list[str]) -> np.array
+    import numpy as np
+
+    # Generate embeddings in batches to avoid memory pressure
+    all_embeddings = []
+    for i in range(0, len(content), batch_size):
+        batch = content[i:i+batch_size]
+        emb = embedding_client.encode(batch)
+        all_embeddings.append(emb)
+
+    embeddings = np.vstack(all_embeddings)
     dimension = embeddings.shape[1]
     index = faiss.IndexFlatIP(dimension)
     index.add(embeddings)
@@ -97,15 +112,21 @@ def calculate_embeddings(content, model_path, vector_store_path):
 
 def main():
     args = parse_arguments()
-    save_path = f'../data/corpus/processed/{args.chunk_size}_{args.min_sentence}_{args.overlap}/{args.dataset}'
+    # Resolve project root relative to this file so script works from any cwd
+    PROJECT_ROOT = Path(__file__).resolve().parent.parent
+    save_path = str(PROJECT_ROOT / 'data' / 'corpus' / 'processed' / f"{args.chunk_size}_{args.min_sentence}_{args.overlap}" / args.dataset)
     vector_store_path = f"{save_path}/vector.index"
-    
+
     print("Starting data processing...")
-    content = process_data(f"../data/corpus/raw/{args.dataset}.json", args.chunk_size, args.min_sentence, args.overlap, save_path)
+    raw_file = str(PROJECT_ROOT / 'data' / 'corpus' / 'raw' / f"{args.dataset}.json")
+    content = process_data(raw_file, args.chunk_size, args.min_sentence, args.overlap, save_path, max_docs=args.max_docs)
     
     print("Calculating embeddings...")
     start_time = time.time()
-    calculate_embeddings(content, model2path["emb_model"], vector_store_path)
+    emb_override = os.getenv("EMBEDDING_MODEL_OVERRIDE")
+    emb_model = emb_override or model2path["emb_model"]
+    embedding_client = get_embedding_client(emb_model)
+    calculate_embeddings(content, embedding_client, vector_store_path)
     end_time = time.time()
     
     print(f"Embeddings generated in {end_time - start_time:.2f} seconds.")

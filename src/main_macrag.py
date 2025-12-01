@@ -33,12 +33,14 @@ from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import FAISS
 from collections import defaultdict
 
+from utils.gemini_handler import get_gemini_response
+
 logger = logging.getLogger()
 
 choices = [
     "glm-4", "gpt-3.5-turbo-16k", "gpt-3.5-turbo-0125", "chatGLM3-6b-8k","LongAlign-7B-64k", "Llama3-70b-8k", "Llama2-13b-chat-longlora", "LongRAG-chatglm3-32k", "LongRAG-qwen1.5-32k","LongRAG-vicuna-v1.5-16k", "LongRAG-llama3-8k",  "LongRAG-llama2-4k",
     "vicuna-7b-v1.5-16k","llama3-8b-instruct-8k", "chatglm3-6b-32k",    
-    "gpt-4o",  "gemini-1.5-pro", "gemini-1.5-flash",
+    "gpt-4o",  "gemini-1.5-pro", "gemini-1.5-flash", "gemini-2.5-pro", "gemini-2.5-flash",
     "mistral-7b-instruct-v0.1",
     "mistral-7b-instruct-v0.3",
     "llama3.1-8b-instruct",
@@ -1075,7 +1077,9 @@ if __name__ == '__main__':
     os.makedirs(log_path, exist_ok=True)
 
     ###### config load -> model_path, model_name, max_len
-    with open("../config/config.yaml", "r") as file:
+    from pathlib import Path
+    CONFIG_PATH = Path(__file__).resolve().parent.parent / "config" / "config.yaml"
+    with open(CONFIG_PATH, "r") as file:
         config = yaml.safe_load(file)
 
     #### 1.3. Load Model (Generation, Reranking...)

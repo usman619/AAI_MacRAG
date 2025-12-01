@@ -5,7 +5,8 @@ api:
   lanchain_api_key: ""
 
 model_path:
-  emb_model: "intfloat/multilingual-e5-large"
+  # Use Gemini embeddings by default (change back to a local HF model id if you prefer)
+  emb_model: "gemini-embedding-001"
   rerank_model: "cross-encoder/ms-marco-MiniLM-L-12-v2"
   chatglm3-6b-8k: "THUDM/chatglm3-6b"
   chatglm3-6b-32k: "THUDM/chatglm3-6b-32k"

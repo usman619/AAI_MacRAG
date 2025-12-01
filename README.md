@@ -8,6 +8,26 @@
 
 Install the requirements with pip: `pip install -r requirements.txt`. We recommend using FlashAttention 2 for optimization and saving GPU memory. The relevant dependencies can be installed according to the code base of [FlashAttention](https://github.com/Dao-AILab/flash-attention).
 
+### Gemini API key (required for Gemini model calls)
+
+This project supports calling Google's Gemini models. The code reads the key from the environment variable `GEMINI_API_KEY` (and will load a local `.env` during development if present).
+
+- Local dev (quick): create a file named `.env` at the project root with the line:
+
+   GEMINI_API_KEY=your_api_key_here
+
+   The repository already ignores `.env` so it will not be committed.
+
+- Temporary session (zsh):
+
+   ```bash
+   export GEMINI_API_KEY="your_api_key_here"
+   ```
+
+- Production (recommended): set the secret with your platform's secret manager or environment config (systemd unit, Docker secrets, Kubernetes Secret, CI/CD secrets). Do NOT store the key in the repo or in images.
+
+The code paths that use Gemini call a helper which checks for `GEMINI_API_KEY` and will give a clear error/message if it's missing.
+
 ## ⚙️ Data Preparation
 
 Following [LongRAG](https://github.com/QingFei1/LongRAG), the raw training data comes from [HotpotQA, 2WikiMultihopQA, MuSiQue](https://github.com/StonyBrookNLP/ircot) and [Qasper](https://allenai.org/data/qasper). The evaluation data and the corresponding retrieval corpus raw data are sourced from [LongBench](https://github.com/THUDM/LongBench).

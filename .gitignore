@@ -13,3 +13,5 @@ figures/
 deprecated/
 tmp/
 test.py
+src/__pycache__
+src/utils/__pycache__

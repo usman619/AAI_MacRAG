@@ -31,4 +31,4 @@ langchain_openai
 langgraph
 langchainhub
 pyyaml
-flash_attn
+python-dotenv

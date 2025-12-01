@@ -4,7 +4,9 @@ from transformers import AutoTokenizer
 import re
 import json
 import yaml
-with open("../config/config.yaml", "r") as file:
+from pathlib import Path
+CONFIG_PATH = Path(__file__).resolve().parent.parent / "config" / "config.yaml"
+with open(CONFIG_PATH, "r") as file:
     config = yaml.safe_load(file)
 # Use chatglm3-6b-32k to calculate the number of tokens
 model2path = config["model_path"]["chatglm3-6b-32k"]

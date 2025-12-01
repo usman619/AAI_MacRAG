@@ -9,8 +9,16 @@ import time
 from openai import OpenAI
 import httpx
 import yaml
-with open("../config/config.yaml", "r") as file:
+from pathlib import Path
+
+# Load configuration relative to the repository root (two levels up from this file)
+CONFIG_PATH = Path(__file__).resolve().parent.parent / "config" / "config.yaml"
+with open(CONFIG_PATH, "r") as file:
     config = yaml.safe_load(file)["api"]
+from dotenv import load_dotenv
+load_dotenv()
+import os
+from utils.gemini_handler import get_gemini_response
 
 def glm(prompt,model,max_tokens):
     try:
@@ -30,72 +38,12 @@ def glm(prompt,model,max_tokens):
             return None
 
 def gemini(prompt, model, max_tokens, temperature):
+    # Use SDK helper which reads GEMINI_API_KEY from environment/.env.
     try:
-        gemini_prompt_setting = {
-            "model": f"{model}",
-            "apikey": config["gemini_key"],
-            "input": { },
-            "generation_config": {
-                "maxOutputTokens": max_tokens,
-                "temperature": temperature,
-                # "topP": 1,
-                # "topK": 32
-                                }
-                     }
-        gemini_input_messages = {
-                    "role": "user",
-                    "parts": {
-                                "text": f"{prompt}"
-                            }
-                    }
-        gemini_safety_settings = [
-                                {
-                                "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-                                "threshold": "BLOCK_NONE"
-                                },
-                                {
-                                "category": "HARM_CATEGORY_HATE_SPEECH",
-                                "threshold": "BLOCK_NONE"
-                                },
-                                {
-                                "category": "HARM_CATEGORY_HARASSMENT",
-                                "threshold": "BLOCK_NONE"
-                                },
-                                {
-                                "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
-                                "threshold": "BLOCK_NONE"
-                                }
-                            ]
-        gemini_prompt_setting['input']['contents'] = gemini_input_messages
-        gemini_prompt_setting['input']['safety_settings']=gemini_safety_settings
-
-        payload = json.dumps(gemini_prompt_setting)
-        url = config["gemini_url"]
-
-        headers = {'Content-Type': 'application/json','User-Agent': 'Mozilla/5.0'}
-        response = requests.request("POST", url, headers=headers, data=payload)
-            
-        output = json.loads(response.text)['candidates'][0]['content']['parts'][0]['text']
-        output = output.replace("```json\n","")
-        response = output.replace("\n```","")
-        return response
-    
+        return get_gemini_response(prompt, model_name=model, temperature=temperature)
     except Exception as e:
-        print(f"An error occurred: {e}")
-        time.sleep(5)
-        try:
-            response = requests.request("POST", url, headers=headers, data=payload)
-
-            output = json.loads(response.text)['candidates'][0]['content']['parts'][0]['text']
-            output = output.replace("```json\n","")
-            response = output.replace("\n```","")
-            return response
-        except Exception as e:
-            print(f"An error occurred: {e}")
-    #    time.sleep(5)
-
-
-    return "None"
+        print(f"An error occurred while calling gemini helper: {e}")
+        return "None"
     
 
 
@@ -159,16 +107,57 @@ def call_api(prompt,model,max_new_tokens, temperature = 1):
             prompt=remove_consecutive_repeated_sentences(prompt)
             res=gpt(prompt,model,max_new_tokens)
     elif "gemini" in model:
-        res = gemini(prompt, model, max_new_tokens, temperature)
+        # Prefer SDK-based helper which reads GEMINI_API_KEY from env/.env
+        try:
+            res = get_gemini_response(prompt, model_name=model, temperature=temperature)
+            # fallback to HTTP-based gemini() if helper failed or returned an error marker
+            if not res or (isinstance(res, str) and res.startswith("Error:")):
+                res = gemini(prompt, model, max_new_tokens, temperature)
+        except Exception:
+            res = gemini(prompt, model, max_new_tokens, temperature)
     assert res != None
     return res
 
 if __name__ == "__main__":
+    # Safe runtime checks: only call remote APIs if the corresponding keys/SDKs are available.
+    print("Configuration quick-check:")
+    print("  zp_key present:", bool(config.get("zp_key")))
+    print("  openai_key present:", bool(config.get("openai_key")))
+    from dotenv import load_dotenv
+    load_dotenv()
+    import os
+    print("  GEMINI_API_KEY present:", bool(os.getenv("GEMINI_API_KEY")))
 
-    print(call_api("Hello", "gemini", 100))
-    print(call_api("Hello", "gpt-4o", 100))
-    print(call_api("Hello","glm-4",100))
-    print(call_api("Hello","chatglm_turbo",100))
+    # Gemini SDK helper
+    try:
+        from utils.gemini_handler import _HAS_GENAI as _HAS_GENAI, _CONFIGURED as _GEMINI_CONFIG
+    except Exception:
+        _HAS_GENAI = False
+        _GEMINI_CONFIG = False
+
+    if _HAS_GENAI and _GEMINI_CONFIG:
+        print("Running a tiny Gemini test...")
+        print(get_gemini_response("Say hello in one sentence.", model_name="gemini-2.5-flash", temperature=0))
+    else:
+        print("Skipping Gemini test: SDK or GEMINI_API_KEY not configured.")
+
+    if config.get("zp_key"):
+        print("Running a tiny GLM/Zhipuai test...")
+        try:
+            print(glm("Hello", "glm-4", 100))
+        except Exception as e:
+            print("GLM test failed:", e)
+    else:
+        print("Skipping GLM test: zp_key not configured.")
+
+    if config.get("openai_key"):
+        print("Running a tiny OpenAI test...")
+        try:
+            print(gpt("Hello", "gpt-4o", 100, 0))
+        except Exception as e:
+            print("OpenAI test failed:", e)
+    else:
+        print("Skipping OpenAI test: openai_key not configured.")
     
 
 

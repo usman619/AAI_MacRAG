@@ -277,7 +277,7 @@ def search_q(args, question):
             ext_rb_pred, doc_len= search_cache_and_predict(ext_rb_pred, f'{log_path}/ext_rb_pred.json', 'ext_rb_pred', question, model_name, model, tokenizer, lambda: create_prompt(''.join(rerank[:args.top_k2] + extractor_rb_output), question), maxlen, args.temperature, doc_len, 'Ext_RB')
         if (ext_rb_pred == "None-api") and args.rerun: #This part is just for re-filling empty prediction from LLMs
             extractor_rb_output = extractor_rb(question, rerank, match_id, args.temperature)
-            ext_rb_pred, doc_len= search_cache_and_predict(ext_rb_pred, f'{log_path_none_rerun}/ext_rb_pred.json', 'ext_rb_pred', question, model_name, model, tokenizer, lambda: create_prompt(''.join(rerank[:args.top_k2] + extractor_rb_output), question), maxlen, args.temperature, doc_len, 'Ext_RB')        
+            ext_rb_pred, doc_len= search_cache_and_predict(ext_rb_pred, f'{log_path}/ext_rb_pred.json', 'ext_rb_pred', question, model_name, model, tokenizer, lambda: create_prompt(''.join(rerank[:args.top_k2] + extractor_rb_output), question), maxlen, args.temperature, doc_len, 'Ext_RB')        
     
     ## 2.7. Extractor_R&B_Ext_Fil
     if args.rb_ext_fil:
@@ -290,7 +290,7 @@ def search_q(args, question):
             rb_ext_fil_pred, doc_len= search_cache_and_predict(rb_ext_fil_pred, f'{log_path}/rb_ext_fil_pred.json', 'rb_ext_fil_pred', question, model_name, model, tokenizer, lambda: create_prompt(''.join(filter_output + extractor_rb_output), question), maxlen, args.temperature, doc_len, 'RB_Ext_Fil')
         if (rb_ext_fil_pred == "None-api") and args.rerun: #This part is just for re-filling empty prediction from LLMs
             extractor_rb_output = extractor_rb(question, rerank, match_id, args.temperature)
-            rb_ext_fil_pred, doc_len= search_cache_and_predict(rb_ext_fil_pred, f'{log_path_none_rerun}/rb_ext_fil_pred.json', 'rb_ext_fil_pred', question, model_name, model, tokenizer, lambda: create_prompt(''.join(filter_output + extractor_rb_output), question), maxlen, args.temperature, doc_len, 'RB_Ext_Fil')        
+            rb_ext_fil_pred, doc_len= search_cache_and_predict(rb_ext_fil_pred, f'{log_path}/rb_ext_fil_pred.json', 'rb_ext_fil_pred', question, model_name, model, tokenizer, lambda: create_prompt(''.join(filter_output + extractor_rb_output), question), maxlen, args.temperature, doc_len, 'RB_Ext_Fil')        
     return question, retriever, rerank, raw_pred, rb_pred, ext_pred, fil_pred, rl_pred, ext_fil_pred, doc_len, ext_rb_pred, rb_ext_fil_pred
  
 def load_cache(cache_path, pred_key, question, doc_len=None, doc_key=None):
@@ -568,7 +568,9 @@ if __name__ == '__main__':
 
     
     ###### config load -> model_path, model_name, max_len
-    with open("../config/config.yaml", "r") as file:
+    from pathlib import Path
+    CONFIG_PATH = Path(__file__).resolve().parent.parent / "config" / "config.yaml"
+    with open(CONFIG_PATH, "r") as file:
         config = yaml.safe_load(file)
     
     #### 1.3. Load Model (Generation, Reranking...)
