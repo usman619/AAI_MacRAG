@@ -93,13 +93,15 @@ def process_data(file_path, chunk_size, min_sentence, overlap, save_path, max_do
     
     return processed_chunks
 
-def calculate_embeddings(content, embedding_client, vector_store_path, batch_size=512):
+def calculate_embeddings(content, embedding_client, vector_store_path, batch_size=32):
     # embedding_client: EmbeddingClient instance with .encode(list[str]) -> np.array
+    # Note: batch_size=32 works well with Ollama; larger sizes may timeout
     import numpy as np
 
     # Generate embeddings in batches to avoid memory pressure
     all_embeddings = []
-    for i in range(0, len(content), batch_size):
+    total_batches = (len(content) + batch_size - 1) // batch_size
+    for i in tqdm(range(0, len(content), batch_size), total=total_batches, desc="Embedding batches"):
         batch = content[i:i+batch_size]
         emb = embedding_client.encode(batch)
         all_embeddings.append(emb)

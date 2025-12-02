@@ -1,0 +1,69 @@
+[2025-12-02 21:45:15][INFO] - ****************************** CONFIGURATION ******************************
+[2025-12-02 21:45:15][INFO] - MaxClients                     --> 1
+[2025-12-02 21:45:15][INFO] - chunk_ext                      --> 1
+[2025-12-02 21:45:15][INFO] - chunk_size                     --> 1500
+[2025-12-02 21:45:15][INFO] - dataset                        --> hotpotqa
+[2025-12-02 21:45:15][INFO] - emb_model_name                 --> intfloat/multilingual-e5-large
+[2025-12-02 21:45:15][INFO] - ext                            --> False
+[2025-12-02 21:45:15][INFO] - ext_fil                        --> False
+[2025-12-02 21:45:15][INFO] - ext_rb                         --> False
+[2025-12-02 21:45:15][INFO] - fil                            --> False
+[2025-12-02 21:45:15][INFO] - log_path                       --> 
+[2025-12-02 21:45:15][INFO] - look_up_initial_chunk          --> True
+[2025-12-02 21:45:15][INFO] - lrag_model                     --> 
+[2025-12-02 21:45:15][INFO] - merge_version                  --> 1
+[2025-12-02 21:45:15][INFO] - model                          --> gemini-2.5-flash
+[2025-12-02 21:45:15][INFO] - overlap_chunk_size             --> 500
+[2025-12-02 21:45:15][INFO] - prompt_version                 --> 1
+[2025-12-02 21:45:15][INFO] - r_path                         --> processed/200_2_2
+[2025-12-02 21:45:15][INFO] - raw_pred                       --> False
+[2025-12-02 21:45:15][INFO] - rb                             --> False
+[2025-12-02 21:45:15][INFO] - rb_ext_fil                     --> False
+[2025-12-02 21:45:15][INFO] - reranking_model                --> marco_MiniLM
+[2025-12-02 21:45:15][INFO] - rerun                          --> False
+[2025-12-02 21:45:15][INFO] - rl                             --> False
+[2025-12-02 21:45:15][INFO] - temperature                    --> 0.0001
+[2025-12-02 21:45:15][INFO] - top_k1                         --> 5
+[2025-12-02 21:45:15][INFO] - top_k2                         --> 3
+[2025-12-02 21:45:15][INFO] - upsample_factor                --> 4
+[2025-12-02 21:45:15][INFO] - upscaling                      --> 1
+[2025-12-02 21:45:15][INFO] - version                        --> v1
+[2025-12-02 21:45:15][INFO] - with_reranking                 --> 0
+[2025-12-02 21:45:15][INFO] - LongRAG model used: 
+[2025-12-02 21:45:15][INFO] - ****************************** CONFIGURATION ******************************
+[2025-12-02 21:46:02][INFO] - ****************************** CONFIGURATION ******************************
+[2025-12-02 21:46:02][INFO] - MaxClients                     --> 1
+[2025-12-02 21:46:02][INFO] - chunk_ext                      --> 1
+[2025-12-02 21:46:02][INFO] - chunk_size                     --> 1500
+[2025-12-02 21:46:02][INFO] - dataset                        --> hotpotqa
+[2025-12-02 21:46:02][INFO] - emb_model_name                 --> intfloat/multilingual-e5-large
+[2025-12-02 21:46:02][INFO] - ext                            --> False
+[2025-12-02 21:46:02][INFO] - ext_fil                        --> False
+[2025-12-02 21:46:02][INFO] - ext_rb                         --> False
+[2025-12-02 21:46:02][INFO] - fil                            --> False
+[2025-12-02 21:46:02][INFO] - log_path                       --> 
+[2025-12-02 21:46:02][INFO] - look_up_initial_chunk          --> True
+[2025-12-02 21:46:02][INFO] - lrag_model                     --> 
+[2025-12-02 21:46:02][INFO] - merge_version                  --> 1
+[2025-12-02 21:46:02][INFO] - model                          --> gemini-2.5-flash
+[2025-12-02 21:46:02][INFO] - overlap_chunk_size             --> 500
+[2025-12-02 21:46:02][INFO] - prompt_version                 --> 1
+[2025-12-02 21:46:02][INFO] - r_path                         --> processed/200_2_2
+[2025-12-02 21:46:02][INFO] - raw_pred                       --> False
+[2025-12-02 21:46:02][INFO] - rb                             --> False
+[2025-12-02 21:46:02][INFO] - rb_ext_fil                     --> False
+[2025-12-02 21:46:02][INFO] - reranking_model                --> marco_MiniLM
+[2025-12-02 21:46:02][INFO] - rerun                          --> False
+[2025-12-02 21:46:02][INFO] - rl                             --> False
+[2025-12-02 21:46:02][INFO] - temperature                    --> 0.0001
+[2025-12-02 21:46:02][INFO] - top_k1                         --> 5
+[2025-12-02 21:46:02][INFO] - top_k2                         --> 3
+[2025-12-02 21:46:02][INFO] - upsample_factor                --> 4
+[2025-12-02 21:46:02][INFO] - upscaling                      --> 1
+[2025-12-02 21:46:02][INFO] - version                        --> v1
+[2025-12-02 21:46:02][INFO] - with_reranking                 --> 0
+[2025-12-02 21:46:02][INFO] - LongRAG model used: 
+[2025-12-02 21:46:02][INFO] - ****************************** CONFIGURATION ******************************
+[2025-12-02 21:46:02][INFO] - Question: Which case was brought to court first Miller v. California or Gates v. Collier ?
+[2025-12-02 21:46:02][DEBUG] - Starting new HTTP connection (1): localhost:11434
+[2025-12-02 21:46:03][DEBUG] - http://localhost:11434 "POST /api/embed HTTP/11" 200 None

@@ -1,0 +1,78 @@
+[2025-12-03 01:40:47][INFO] - ****************************** CONFIGURATION ******************************
+[2025-12-03 01:40:47][INFO] - MaxClients                     --> 1
+[2025-12-03 01:40:47][INFO] - chunk_ext                      --> 1
+[2025-12-03 01:40:47][INFO] - chunk_size                     --> 1500
+[2025-12-03 01:40:47][INFO] - dataset                        --> hotpotqa
+[2025-12-03 01:40:47][INFO] - emb_model_name                 --> intfloat/multilingual-e5-large
+[2025-12-03 01:40:47][INFO] - ext                            --> False
+[2025-12-03 01:40:47][INFO] - ext_fil                        --> False
+[2025-12-03 01:40:47][INFO] - ext_rb                         --> False
+[2025-12-03 01:40:47][INFO] - fil                            --> False
+[2025-12-03 01:40:47][INFO] - log_path                       --> 
+[2025-12-03 01:40:47][INFO] - look_up_initial_chunk          --> True
+[2025-12-03 01:40:47][INFO] - lrag_model                     --> 
+[2025-12-03 01:40:47][INFO] - merge_version                  --> 1
+[2025-12-03 01:40:47][INFO] - model                          --> gemini-2.5-flash
+[2025-12-03 01:40:47][INFO] - overlap_chunk_size             --> 500
+[2025-12-03 01:40:47][INFO] - prompt_version                 --> 1
+[2025-12-03 01:40:47][INFO] - r_path                         --> processed/200_2_2
+[2025-12-03 01:40:47][INFO] - raw_pred                       --> False
+[2025-12-03 01:40:47][INFO] - rb                             --> True
+[2025-12-03 01:40:47][INFO] - rb_ext_fil                     --> False
+[2025-12-03 01:40:47][INFO] - reranking_model                --> marco_MiniLM
+[2025-12-03 01:40:47][INFO] - rerun                          --> False
+[2025-12-03 01:40:47][INFO] - rl                             --> False
+[2025-12-03 01:40:47][INFO] - temperature                    --> 0.0001
+[2025-12-03 01:40:47][INFO] - top_k1                         --> 50
+[2025-12-03 01:40:47][INFO] - top_k2                         --> 3
+[2025-12-03 01:40:47][INFO] - upsample_factor                --> 4
+[2025-12-03 01:40:47][INFO] - upscaling                      --> 1
+[2025-12-03 01:40:47][INFO] - version                        --> v1
+[2025-12-03 01:40:47][INFO] - with_reranking                 --> 0
+[2025-12-03 01:40:47][INFO] - LongRAG model used: 
+[2025-12-03 01:40:47][INFO] - ****************************** CONFIGURATION ******************************
+[2025-12-03 01:40:47][INFO] - Question: Which case was brought to court first Miller v. California or Gates v. Collier ?
+[2025-12-03 01:40:47][DEBUG] - Starting new HTTP connection (1): localhost:11434
+[2025-12-03 01:40:48][DEBUG] - http://localhost:11434 "POST /api/embed HTTP/11" 200 None
+[2025-12-03 01:41:00][INFO] - Question: The actor that plays Phileas Fogg in "Around the World in 80 Days", co-starred with Gary Cooper in a 1939 Goldwyn Productions film based on a novel by what author?
+[2025-12-03 01:41:00][DEBUG] - Starting new HTTP connection (1): localhost:11434
+[2025-12-03 01:41:00][DEBUG] - http://localhost:11434 "POST /api/embed HTTP/11" 200 None
+[2025-12-03 01:41:05][INFO] - Question: Prior to playing for Michigan State, Keith Nichol played football for a school located in what city?
+[2025-12-03 01:41:05][DEBUG] - Starting new HTTP connection (1): localhost:11434
+[2025-12-03 01:41:05][DEBUG] - http://localhost:11434 "POST /api/embed HTTP/11" 200 None
+[2025-12-03 01:41:12][INFO] - Question: Gary L. Bennett was a part of the space missions that have a primary destination of what celestial body?
+[2025-12-03 01:41:12][DEBUG] - Starting new HTTP connection (1): localhost:11434
+[2025-12-03 01:41:12][DEBUG] - http://localhost:11434 "POST /api/embed HTTP/11" 200 None
+[2025-12-03 01:42:39][INFO] - Question: Was Atom Egoyans biggest commercial success on stage or on film?
+[2025-12-03 01:42:39][DEBUG] - Starting new HTTP connection (1): localhost:11434
+[2025-12-03 01:42:39][DEBUG] - http://localhost:11434 "POST /api/embed HTTP/11" 200 None
+[2025-12-03 01:44:04][INFO] - Question: Celebrity Fifteen to One has had more than one appearance by an English writer and former Conservative Member of what?
+[2025-12-03 01:44:04][DEBUG] - Starting new HTTP connection (1): localhost:11434
+[2025-12-03 01:44:04][DEBUG] - http://localhost:11434 "POST /api/embed HTTP/11" 200 None
+[2025-12-03 01:45:29][INFO] - Question: Thirukkalacherry is a village in which Indian town?
+[2025-12-03 01:45:29][DEBUG] - Starting new HTTP connection (1): localhost:11434
+[2025-12-03 01:45:29][DEBUG] - http://localhost:11434 "POST /api/embed HTTP/11" 200 None
+[2025-12-03 01:46:54][INFO] - Question: Which is a flowering plant, Pueraria or Pleiospilos?
+[2025-12-03 01:46:54][DEBUG] - Starting new HTTP connection (1): localhost:11434
+[2025-12-03 01:46:54][DEBUG] - http://localhost:11434 "POST /api/embed HTTP/11" 200 None
+[2025-12-03 01:48:20][INFO] - Question: After Russell D. Moore served at the Southern Baptist Theological Seminary he became the President of The Ethics & Religious Liberty Commission (ERLC) in what year?
+[2025-12-03 01:48:20][DEBUG] - Starting new HTTP connection (1): localhost:11434
+[2025-12-03 01:48:20][DEBUG] - http://localhost:11434 "POST /api/embed HTTP/11" 200 None
+[2025-12-03 01:49:45][INFO] - Question: For which band, was the female member of Fitz and The Tantrums, the front woman for ten years ?
+[2025-12-03 01:49:45][DEBUG] - Starting new HTTP connection (1): localhost:11434
+[2025-12-03 01:49:45][DEBUG] - http://localhost:11434 "POST /api/embed HTTP/11" 200 None
+[2025-12-03 01:51:10][INFO] - Question: When was the American singer, songwriter, record producer, dancer and actress born who's second studio album is Chapter II?
+[2025-12-03 01:51:10][DEBUG] - Starting new HTTP connection (1): localhost:11434
+[2025-12-03 01:51:10][DEBUG] - http://localhost:11434 "POST /api/embed HTTP/11" 200 None
+[2025-12-03 01:52:35][INFO] - Question: The Greatest Event in Television History aired on the channel that was founded by whom?
+[2025-12-03 01:52:35][DEBUG] - Starting new HTTP connection (1): localhost:11434
+[2025-12-03 01:52:35][DEBUG] - http://localhost:11434 "POST /api/embed HTTP/11" 200 None
+[2025-12-03 01:54:00][INFO] - Question: Who starred in her final film role in the 1964 film directed by the man who also did Vera Cruz and Kiss Me Deadly?
+[2025-12-03 01:54:00][DEBUG] - Starting new HTTP connection (1): localhost:11434
+[2025-12-03 01:54:00][DEBUG] - http://localhost:11434 "POST /api/embed HTTP/11" 200 None
+[2025-12-03 01:55:25][INFO] - Question: Finally includes the song that peaked at what on the US Hot 100
+[2025-12-03 01:55:25][DEBUG] - Starting new HTTP connection (1): localhost:11434
+[2025-12-03 01:55:25][DEBUG] - http://localhost:11434 "POST /api/embed HTTP/11" 200 None
+[2025-12-03 01:56:50][INFO] - Question: What are some other areas that share a common deer species with the forests of Mara and Mondrem?
+[2025-12-03 01:56:50][DEBUG] - Starting new HTTP connection (1): localhost:11434
+[2025-12-03 01:56:50][DEBUG] - http://localhost:11434 "POST /api/embed HTTP/11" 200 None

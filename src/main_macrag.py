@@ -34,6 +34,11 @@ from langchain.vectorstores import FAISS
 from collections import defaultdict
 
 from utils.gemini_handler import get_gemini_response
+from utils.embeddings import get_embedding_client
+from pathlib import Path
+
+# Resolve project root for robust path handling across functions
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 logger = logging.getLogger()
 
@@ -771,7 +776,16 @@ def sort_section(args, question, section, match_id):
 
     ####################################################################################
     ####################################################################################
-    if args.look_up_initial_chunk:
+    # Check if chunks are plain text or dicts with 'chunk_id'
+    # For plain-text chunks (from gen_index_longrag.py), skip the look_up_initial_chunk logic
+    is_plain_text = False
+    if section and isinstance(section[0], str):
+        try:
+            eval(section[0])  # Try to parse as Python dict
+        except:
+            is_plain_text = True
+    
+    if args.look_up_initial_chunk and not is_plain_text:
         # mapping and delete duplicates
         section_fixed = []
         chunk_id_list = []
@@ -800,6 +814,17 @@ def sort_section(args, question, section, match_id):
         match_id = temp['match_id'].tolist()
         chunk_ids = temp['chunk_id'].tolist()
         q = temp['q'].tolist()
+    elif is_plain_text:
+        # Plain text chunks - just deduplicate
+        temp = pd.DataFrame()
+        temp['q'] = q
+        temp['section'] = section
+        temp['match_id'] = match_id
+        temp = temp.drop_duplicates(subset='section', keep='first')
+        section = temp['section'].tolist()
+        match_id = temp['match_id'].tolist()
+        chunk_ids = list(range(len(match_id)))  # Use sequential IDs for plain text chunks
+        q = temp['q'].tolist()
     ####################################################################################
     ####################################################################################
     features = cross_tokenizer(q, section, padding=True, truncation=True, return_tensors="pt").to(device)
@@ -808,7 +833,7 @@ def sort_section(args, question, section, match_id):
         scores = cross_model(**features).logits.squeeze(dim=1)
     sort_scores = torch.argsort(scores, dim=0, descending=True).cpu()
 
-    with open(f'../data/corpus/{args.r_path}/{args.dataset}/id_to_rawid.json', encoding='utf-8') as f:
+    with open(PROJECT_ROOT / 'data' / 'corpus' / args.r_path / args.dataset / 'id_to_rawid.json', encoding='utf-8') as f:
         id_to_rawid = json.load(f)
 
     # Create doc_ids list regardless of upscaling setting
@@ -852,6 +877,11 @@ def sort_section(args, question, section, match_id):
                 chunk_ids = chunk_ids[:args.top_k2]
             # Update doc_ids
             doc_ids = doc_ids[:args.top_k2]
+
+    # Skip chunk extension logic for plain text chunks (requires structured chunks from gen_index_macrag.py)
+    if is_plain_text:
+        print('Using plain text chunks - skipping chunk extension/merging logic')
+        return result, match_id
 
     if args.look_up_initial_chunk and args.chunk_ext >= 0:  # >= implied alway merging whatever chunk_ext values are, if > then, h=0 did not make merging too.
         print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
@@ -1015,7 +1045,8 @@ def create_prompt(input, question):
 
 if __name__ == '__main__':
     seed_everything(42)
-    index_path = f'../data/corpus/{args.r_path}/{args.dataset}/vector.index'  # Vector index path
+    
+    index_path = str(PROJECT_ROOT / 'data' / 'corpus' / args.r_path / args.dataset / 'vector.index')
 
     ## 1. Load Vector, Data, Model...
 
@@ -1025,17 +1056,17 @@ if __name__ == '__main__':
     print("Vector Load Done!!!")
     #### 1.2. Load Data
     ###### Paragraph
-    with open(f'../data/corpus/raw/{args.dataset}.json', encoding='utf-8') as f:
+    with open(PROJECT_ROOT / 'data' / 'corpus' / 'raw' / f'{args.dataset}.json', encoding='utf-8') as f:
         raw_data = json.load(f)
     ###### chunk <-> Paragraph
     ###### - summary_chunk_slicing
     ###### - for retriever
-    with open(f'../data/corpus/{args.r_path}/{args.dataset}/id_to_rawid.json', encoding='utf-8') as f:
+    with open(PROJECT_ROOT / 'data' / 'corpus' / args.r_path / args.dataset / 'id_to_rawid.json', encoding='utf-8') as f:
         id_to_rawid = json.load(f)
     ###### chunk
     ###### - chunk contents
     ###### - for retriever
-    with open(f"../data/corpus/{args.r_path}/{args.dataset}/chunks.json", "r", encoding='utf-8') as fin:
+    with open(PROJECT_ROOT / 'data' / 'corpus' / args.r_path / args.dataset / 'chunks.json', "r", encoding='utf-8') as fin:
         chunk_data = json.load(fin)
 
     now = datetime.now()
@@ -1088,8 +1119,11 @@ if __name__ == '__main__':
     maxlen = config["model_maxlen"][model_name]
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    ## emb_model ["BAAI/bge-m3", "intfloat/multilingual-e5-large"]
-    emb_model = SentenceTransformer("{}".format(args.emb_model_name)).to(device)
+    ## emb_model - use our embedding adapter which supports Ollama, HF, HTTP, etc.
+    ## Priority: OLLAMA_BASE_URL env var > args.emb_model_name
+    emb_model = get_embedding_client(args.emb_model_name)
+    print(f"Embedding model loaded: {type(emb_model).__name__}")
+    
     if args.reranking_model == "marco_MiniLM":
         print("############# marco_MiniLM model reranking #############")
         cross_tokenizer = AutoTokenizer.from_pretrained(model2path["rerank_model"])  # "ms-marco-MiniLM-L-12-v2"
@@ -1110,13 +1144,18 @@ if __name__ == '__main__':
             model2path, lrag_model_name)
     else:
         lrag_model_name, lrag_model, lrag_tokenizer, lrag_maxlen = (model_name, model, tokenizer, maxlen)
-    set_prompt_tokenizer = AutoTokenizer.from_pretrained(model2path["chatglm3-6b-32k"], trust_remote_code=True)
+    # Use a universal tokenizer for prompt length estimation (avoid ChatGLM compatibility issues)
+    try:
+        set_prompt_tokenizer = AutoTokenizer.from_pretrained("gpt2")
+    except Exception:
+        # Fallback to ChatGLM if gpt2 not available
+        set_prompt_tokenizer = AutoTokenizer.from_pretrained(model2path["chatglm3-6b-32k"], trust_remote_code=True)
     setup_logger(logger)
     print_args(args)
 
     #### 1.4. Load eval data
     questions, answer, raw_preds, rank_preds, ext_preds, fil_preds, longdoc_preds, ext_fil_preds, docs_len, ext_rb_preds, rb_ext_fil_preds = [], [], [], [], [], [], [], [], [], [], []
-    with open(f'../data/eval/{args.dataset}.json', encoding='utf-8') as f:
+    with open(PROJECT_ROOT / 'data' / 'eval' / f'{args.dataset}.json', encoding='utf-8') as f:
         qs_data = json.load(f)
 
     for d in qs_data:

@@ -1,0 +1,5 @@
+,RAG-Base,RAG-Long,Extractor,Filter,E&F,Average
+hotpotqa,,,,,,
+Performance(F1),3.24,0.0,0.0,0.0,0.0,0.648
+Count_None,0,0,0,0,0,
+Count_provide,142,0,0,0,0,

@@ -1,0 +1,39 @@
+{
+    "F1": {
+        "raw_pre": 0.0,
+        "R&B": 3.24,
+        "Ext": 0.0,
+        "Fil": 0.0,
+        "R&L": 0.0,
+        "E&F": 0.0,
+        "Ext_RB": 0.0,
+        "RB_Ext_Fil": 0.0
+    },
+    "doc_len": {
+        "Ext": 0.0,
+        "Fil": 0.0,
+        "R&B": 679.595,
+        "R&L": 0.0,
+        "E&F": 0.0,
+        "Ext_RB": 0.0,
+        "RB_Ext_Fil": 0.0
+    },
+    "Count_None": {
+        "Ext": 0,
+        "Fil": 0,
+        "R&B": 0,
+        "R&L": 0,
+        "E&F": 0,
+        "Ext_RB": 0,
+        "RB_Ext_Fil": 0
+    },
+    "Count_Provide": {
+        "Ext": 0,
+        "Fil": 0,
+        "R&B": 142,
+        "R&L": 0,
+        "E&F": 0,
+        "Ext_RB": 0,
+        "RB_Ext_Fil": 0
+    }
+}
